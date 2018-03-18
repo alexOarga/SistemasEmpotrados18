@@ -1,0 +1,21 @@
+/* This is a linker parameter file for the mc9s08sv16 */
+
+NAMES END 
+
+SEGMENTS 
+
+    RAM                      =  READ_WRITE   0x0040 TO 0x043F ;
+    FLASH                    =  READ_ONLY    0xC000 TO 0xFFAD ;
+    
+END
+
+PLACEMENT 
+
+    .data                       INTO  RAM ;
+    .text                       INTO  FLASH ; 
+
+END
+
+STACKSIZE 0x50
+
+VECTOR 0 _Startup 
