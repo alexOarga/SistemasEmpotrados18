@@ -25,14 +25,15 @@ _startupData is allocated at 0xC084 and uses 6 Bytes
 extern struct _tagStartup {
   unsigned nofZeroOut     1
   _Range   pZeroOut       0x40     19
-  _Copy    *toCopyDownBeg 0xC202
+  _Copy    *toCopyDownBeg 0xC222
 } _startupData;
 
 *********************************************************************************************
 SECTION-ALLOCATION SECTION
 Section Name                    Size  Type     From       To       Segment
 ---------------------------------------------------------------------------------------------
-.text                            372     R     0xC08E     0xC201   FLASH
+.data                             12   R/W       0x40       0x4B   RAM
+.text                            404     R     0xC08E     0xC221   FLASH
 .abs_section_0                     1   N/I        0x0        0x0   .absSeg0
 .abs_section_1                     1   N/I        0x1        0x1   .absSeg1
 .abs_section_6                     1   N/I        0x6        0x6   .absSeg2
@@ -146,15 +147,15 @@ Section Name                    Size  Type     From       To       Segment
 .abs_section_1862                  2   N/I     0x1862     0x1863   .absSeg110
 .abs_section_1864                  2   N/I     0x1864     0x1865   .absSeg111
 .abs_section_fff6                  2     R     0xFFF6     0xFFF7   .absSeg112
-.bss                              19   R/W       0x40       0x52   RAM
+.bss                               7   R/W       0x4C       0x52   RAM
 .startData                        10     R     0xC084     0xC08D   FLASH
 .init                            132     R     0xC000     0xC083   FLASH
 .stack                            80   R/W       0x53       0xA2   RAM
-.copy                              2     R     0xC202     0xC203   FLASH
+.copy                             15     R     0xC222     0xC230   FLASH
 .vectSeg113_vect                   2     R     0xFFFE     0xFFFF   .vectSeg113
 
 Summary of section sizes per section type:
-READ_ONLY (R):         208 (dec:      520)
+READ_ONLY (R):         235 (dec:      565)
 READ_WRITE (R/W):       63 (dec:       99)
 NO_INIT (N/I):          85 (dec:      133)
 
@@ -184,7 +185,7 @@ MODULE:                 -- MC9S08SV16.C.o --
      _IRQSC                                       B       1       1       0   .abs_section_b
      _KBISC                                       C       1       1       3   .abs_section_c
      _KBIPE                                       D       1       1       1   .abs_section_d
-     _KBIES                                       E       1       1       1   .abs_section_e
+     _KBIES                                       E       1       1       2   .abs_section_e
      _ACMPSC                                      F       1       1       0   .abs_section_f
      _TPM2SC                                     10       1       1       0   .abs_section_10
      _TPM2C0SC                                   15       1       1       0   .abs_section_15
@@ -202,7 +203,7 @@ MODULE:                 -- MC9S08SV16.C.o --
      _PTADD                                      39       1       1       2   .abs_section_39
      _PTBD                                       3A       1       1       0   .abs_section_3a
      _PTBDD                                      3B       1       1       0   .abs_section_3b
-     _PTCD                                       3C       1       1       5   .abs_section_3c
+     _PTCD                                       3C       1       1       7   .abs_section_3c
      _PTCDD                                      3D       1       1       2   .abs_section_3d
      _PTDD                                       3E       1       1       0   .abs_section_3e
      _PTDDD                                      3F       1       1       0   .abs_section_3f
@@ -229,7 +230,7 @@ MODULE:                 -- MC9S08SV16.C.o --
      _PTBDS                                    1846       1       1       0   .abs_section_1846
      _PTCPE                                    1848       1       1       0   .abs_section_1848
      _PTCSE                                    1849       1       1       0   .abs_section_1849
-     _PTCDS                                    184A       1       1       0   .abs_section_184a
+     _PTCDS                                    184A       1       1       1   .abs_section_184a
      _PTDPE                                    184C       1       1       0   .abs_section_184c
      _PTDSE                                    184D       1       1       0   .abs_section_184d
      _PTDDS                                    184E       1       1       0   .abs_section_184e
@@ -299,17 +300,17 @@ MODULE:                 -- Start08.c.o --
      __SEG_END_SSTACK                            A3       0       0       1               
 MODULE:                 -- parint.c.o --
 - PROCEDURES:
-     main                                      C107      80     128       1   .text       
-     inicializacion                            C187      3E      62       1   .text       
-     display                                   C1C5      19      25       1   .text       
-     isr_pio_handler                           C1DE      24      36       1   .text       
+     main                                      C107      7E     126       1   .text       
+     inicializacion                            C185      4B      75       1   .text       
+     display                                   C1D0      2D      45       4   .text       
+     isr_pio_handler                           C1FD      25      37       1   .text       
 - VARIABLES:
-     c                                           40       1       1       9   .bss        
-     pulsador_1                                  41       2       2       3   .bss        
-     pulsador_2                                  43       2       2       2   .bss        
-     pulsador_3                                  45       2       2       2   .bss        
-     cola                                        47       A      10       2   .bss        
-     puntero                                     51       2       2       3   .bss        
+     cola                                        40       A      10       4   .data       
+     puntero                                     4A       2       2       5   .data       
+     c                                           4C       1       1       5   .bss        
+     pulsador_1                                  4D       2       2       3   .bss        
+     pulsador_2                                  4F       2       2       3   .bss        
+     pulsador_3                                  51       2       2       3   .bss        
      _Vector_4                                 FFF6       2       2       0   .abs_section_fff6
 
 *********************************************************************************************
@@ -319,16 +320,18 @@ MODULE STATISTIC
   RTSHC08.C.o (ansiis.lib)                     0    121      0
   MC9S08SV16.C.o                             133      0      0
   Start08.c.o                                  0    132      0
-  parint.c.o                                  19    251      2
-  other                                       80     12      2
+  parint.c.o                                  19    283      2
+  other                                       80     12     15
 
 *********************************************************************************************
 SECTION USE IN OBJECT-ALLOCATION SECTION
 ---------------------------------------------------------------------------------------------
 SECTION: ".text"
   _IDIVMOD _IMODU_STAR08 main inicializacion display isr_pio_handler 
+SECTION: ".data"
+  cola puntero 
 SECTION: ".bss"
-  c pulsador_1 pulsador_2 pulsador_3 cola puntero 
+  c pulsador_1 pulsador_2 pulsador_3 
 SECTION: ".init"
   loadByte Init _Startup 
 SECTION: ".abs_section_0"
@@ -572,7 +575,7 @@ OBJECT LIST SORTED BY ADDRESS
      _IRQSC                                       B       1       1       0   .abs_section_b
      _KBISC                                       C       1       1       3   .abs_section_c
      _KBIPE                                       D       1       1       1   .abs_section_d
-     _KBIES                                       E       1       1       1   .abs_section_e
+     _KBIES                                       E       1       1       2   .abs_section_e
      _ACMPSC                                      F       1       1       0   .abs_section_f
      _TPM2SC                                     10       1       1       0   .abs_section_10
      _TPM2CNT                                    11       2       2       0   .abs_section_11
@@ -602,16 +605,16 @@ OBJECT LIST SORTED BY ADDRESS
      _PTADD                                      39       1       1       2   .abs_section_39
      _PTBD                                       3A       1       1       0   .abs_section_3a
      _PTBDD                                      3B       1       1       0   .abs_section_3b
-     _PTCD                                       3C       1       1       5   .abs_section_3c
+     _PTCD                                       3C       1       1       7   .abs_section_3c
      _PTCDD                                      3D       1       1       2   .abs_section_3d
      _PTDD                                       3E       1       1       0   .abs_section_3e
      _PTDDD                                      3F       1       1       0   .abs_section_3f
-     c                                           40       1       1       9   .bss        
-     pulsador_1                                  41       2       2       3   .bss        
-     pulsador_2                                  43       2       2       2   .bss        
-     pulsador_3                                  45       2       2       2   .bss        
-     cola                                        47       A      10       2   .bss        
-     puntero                                     51       2       2       3   .bss        
+     cola                                        40       A      10       4   .data       
+     puntero                                     4A       2       2       5   .data       
+     c                                           4C       1       1       5   .bss        
+     pulsador_1                                  4D       2       2       3   .bss        
+     pulsador_2                                  4F       2       2       3   .bss        
+     pulsador_3                                  51       2       2       3   .bss        
      _SRS                                      1800       1       1       0   .abs_section_1800
      _SBDFR                                    1801       1       1       0   .abs_section_1801
      _SOPT1                                    1802       1       1       1   .abs_section_1802
@@ -639,7 +642,7 @@ OBJECT LIST SORTED BY ADDRESS
      _PTBDS                                    1846       1       1       0   .abs_section_1846
      _PTCPE                                    1848       1       1       0   .abs_section_1848
      _PTCSE                                    1849       1       1       0   .abs_section_1849
-     _PTCDS                                    184A       1       1       0   .abs_section_184a
+     _PTCDS                                    184A       1       1       1   .abs_section_184a
      _PTDPE                                    184C       1       1       0   .abs_section_184c
      _PTDSE                                    184D       1       1       0   .abs_section_184d
      _PTDDS                                    184E       1       1       0   .abs_section_184e
@@ -685,10 +688,10 @@ OBJECT LIST SORTED BY ADDRESS
      _Startup                                  C07B       9       9       0   .init       
      _IDIVMOD                                  C08E      69     105       1   .text       
      _IMODU_STAR08                             C0F7      10      16       1   .text       
-     main                                      C107      80     128       1   .text       
-     inicializacion                            C187      3E      62       1   .text       
-     display                                   C1C5      19      25       1   .text       
-     isr_pio_handler                           C1DE      24      36       1   .text       
+     main                                      C107      7E     126       1   .text       
+     inicializacion                            C185      4B      75       1   .text       
+     display                                   C1D0      2D      45       4   .text       
+     isr_pio_handler                           C1FD      25      37       1   .text       
      _Vector_4                                 FFF6       2       2       0   .abs_section_fff6
 
 *********************************************************************************************
@@ -721,7 +724,19 @@ RTSHC08.C.o (ansiis.lib):
 *********************************************************************************************
 COPYDOWN SECTION
 ---------------------------------------------------------------------------------------------
-------- ROM-ADDRESS: 0xC202 ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xC222 ---- SIZE       4 ---
+Filling bytes inserted
+ 00090043
+------- ROM-ADDRESS: 0xC226 ---- RAM-ADDRESS: 0x43 ---- SIZE       1 ---
+Name of initialized Object : cola:3
+ 01
+------- ROM-ADDRESS: 0xC227 ---- SIZE       7 ---
+Filling bytes inserted
+ 0000000000 0000
+------- ROM-ADDRESS: 0xC22E ---- RAM-ADDRESS: 0x4B ---- SIZE       1 ---
+Name of initialized Object : puntero:1
+ 02
+------- ROM-ADDRESS: 0xC22F ---- SIZE       2 ---
 Filling bytes inserted
  0000
 
@@ -731,10 +746,10 @@ OBJECT-DEPENDENCIES SECTION
 Init                      USES _startupData loadByte 
 _Startup                  USES __SEG_END_SSTACK Init main 
 _IMODU_STAR08             USES _IDIVMOD 
-main                      USES inicializacion c pulsador_1 puntero cola 
-                                _IMODU_STAR08 pulsador_2 pulsador_3 display 
+main                      USES inicializacion c display pulsador_1 pulsador_2 
+                                pulsador_3 puntero _IMODU_STAR08 cola 
 inicializacion            USES _ICSTRM _ICSC2 _SOPT1 _PTAPE _PTADD _KBIPE 
-                                _KBISC _KBIES _PTCDD 
+                                _KBISC _KBIES _PTCD _PTCDD _PTCDS 
 display                   USES _PTCD 
 isr_pio_handler           USES _PTAD pulsador_1 pulsador_2 pulsador_3 _KBISC 
 _Vector_4                 USES isr_pio_handler 
@@ -748,12 +763,12 @@ DEPENDENCY TREE
  |  | 
  |  +- inicializacion      
  |  |    
- |  +- _IMODU_STAR08       
- |  |  | 
- |  |  +- _IDIVMOD            
- |  |       
  |  +- display             
- |       
+ |  |    
+ |  +- _IMODU_STAR08       
+ |     | 
+ |     +- _IDIVMOD            
+ |          
  +- _Startup            
     | 
     +- Init                
@@ -773,5 +788,5 @@ STATISTIC SECTION
 ExeFile:
 --------
 Number of blocks to be downloaded: 4
-Total size of all blocks to be downloaded: 520
+Total size of all blocks to be downloaded: 565
 
