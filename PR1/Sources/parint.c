@@ -18,7 +18,7 @@
 #define digito1 1
 #define digito2 2
 #define displayer_0 1
-#define displayer_1 0
+#define displayer_1 2
 
 /* Variables globales */
 volatile unsigned char c = 0;
@@ -28,7 +28,8 @@ volatile unsigned int pulsador_2 = 0;
 volatile unsigned int pulsador_3 = 0;
 /* cola circular */
 volatile unsigned int cola[SIZE] ={0,1,0,0,0};
-volatile unsigned int puntero = 2; // iterador sobre la cola  
+volatile unsigned int puntero = 0; // iterador sobre la cola
+volatile unsigned int puntero_aux = 1; // iterador sobre la cola   
 /********************************************/
 
 /* Funciones */
@@ -48,7 +49,7 @@ void display (unsigned char queDisplay, unsigned char valor);
 void main(void){
 
   inicializacion ();
-		  
+    
 	asm SEI;
   c=0;
   asm CLI;
@@ -62,11 +63,13 @@ void main(void){
 	  if( pulsador_1 == 1 ){	  
 	 	  
 	 	  c = pulsador_2*2 + pulsador_3;
-	 	  puntero = (puntero + 1)%(SIZE-1);
-	 	  cola[puntero] = c;
 	 	  
-	 	  display(displayer_0,cola[puntero]);
-	 	  display(displayer_1,cola[puntero+1]);
+	 	  puntero = puntero + 1;
+	 	  puntero_aux = puntero + 1;
+	 	  
+	 	  if(puntero_aux == SIZE) puntero_aux = 0;
+	 	  if(puntero == SIZE ) puntero =0;
+
 	  	// almacena en la cola
 	  	// aumenta puntero de cola
 	    // display 0 muestra 0
@@ -74,7 +77,9 @@ void main(void){
 	  	pulsador_1 = 0;
 	  	pulsador_2 = 0;
 	  	pulsador_3 = 0;	  	     	  	  	 
-	  	}	  	
+	  	}
+	  	display(displayer_0,cola[puntero]);
+	 	  display(displayer_1,cola[puntero_aux]);	  	
 	  }
 /********************************************/
 }
@@ -136,11 +141,18 @@ void inicializacion (void){
 
 
 void display (unsigned char queDisplay, unsigned char valor) {
-  queDisplay = queDisplay%2;
+  if(queDisplay ==55){
+    queDisplay = 1;
+  }
 	if( valor >= 0 && valor <= 9 ){
-      PTCD |= queDisplay << 4;
-		  PTCD &= ~(0x0f);
-		  PTCD|=valor;
+	    
+	    PTCD |= 0xf0;
+	    PTCD &= 0xf0;
+	    PTCD |= valor;
+	    
+	    
+      PTCD &= ~((1 << queDisplay) << 4);
+		  
 	}
 }  
 
@@ -148,15 +160,15 @@ void display (unsigned char queDisplay, unsigned char valor) {
 void interrupt 4 isr_pio_handler(void){
 /********************************************/
 
-	if(( PTAD & 0x2) == 0x2 ){	// si se ha pulsado
+
 		pulsador_1 = 1;
-	}
-	if( (PTAD & 0x4) == 0x4 ){
+	
+	if( PTAD_PTAD2 == 1 ){
 		pulsador_2 = 0;
 	}else{
 	  pulsador_2 = 1;
 	}
-	if( (PTAD & 0x8) == 0x8  ){
+	if( PTAD_PTAD3 == 1  ){
 		pulsador_3 = 0;
 	}else{
 	  pulsador_3 = 1;
