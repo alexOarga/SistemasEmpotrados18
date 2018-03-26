@@ -74,6 +74,9 @@ void main(void){
 	  	// aumenta puntero de cola
 	    // display 0 muestra 0
 	    
+	    if(puntero==0) cola[SIZE-1] = c;
+	    else cola[puntero-1] = c;
+	    
 	  	pulsador_1 = 0;
 	  	pulsador_2 = 0;
 	  	pulsador_3 = 0;	  	     	  	  	 

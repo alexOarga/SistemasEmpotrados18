@@ -27,7 +27,7 @@ void Stop_Clock (void) ;
 unsigned int Get_Time (void) ;
    /* Obtención de la cuenta del reloj*/
    
-delay_until(unsigned int T);
+void delay_until(unsigned int T);
     /* Espera bloqueante hasta que la cuenta del reloj llegue
        a T */
        

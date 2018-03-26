@@ -92,4 +92,3 @@ void delay_until(unsigned int T){
   while(!(T==tick_counter))
     asm WAIT ;
 }
-

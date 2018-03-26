@@ -20,11 +20,13 @@
 
 #define TRUE 1
 #define FALSE 0
-const unsigned int periodo = 100; // periodo cada 100 ms
+const unsigned int periodo = 1; // periodo cada 100 ms
+
 
 /* Variables globales */
 
-unsigned char Detenido ;
+volatile unsigned char Detenido=0;
+volatile unsigned int siguiente=0;
 /********************************************/
 volatile unsigned int pulsador_1 = 0;
 volatile unsigned int pulsador_2 = 0;
@@ -62,17 +64,41 @@ void main (void) {
    while (1) {
 /********************************************/
 	volatile unsigned int time = Get_Time();
-	volatile unsigned int milisec = (time%1000)/100;
-	volatile unsigned int sec_d2 = (time/1000)/10; 
-	volatile unsigned int sec_d1 = (time/1000)%10; 
+	unsigned char milisec = (time/100)%10;
+	unsigned char sec_d2;
+	unsigned char sec_d1; 
 
 	display (0, milisec);
+	siguiente += periodo ;
+	if(!Detenido) delay_until(siguiente) ;
+	
+	sec_d1 = (time/1000)%10;
 	display (1, sec_d1);
+	siguiente += periodo ;
+	if(!Detenido) delay_until(siguiente) ;
+	
+	sec_d2 = (time/10000)%10;
 	display (2, sec_d2);
 	
 
+  if(pulsador_1 == 1){
+    if(Detenido) Start_Clock ();    
+    Detenido = 1 - Detenido;
+    pulsador_1=0;
+    siguiente=0;
+  }
+    
+  
+  if(pulsador_2 == 1){
+     Reset_Clock();
+     Start_Clock () ;
+     pulsador_2 = 0;
+     siguiente = 0;
+  }
+  
+
 	siguiente += periodo ;
-	delay_until(siguiente) ;   
+	if(!Detenido) delay_until(siguiente) ;   
 /********************************************/
    }
 }  
@@ -89,10 +115,7 @@ void InitSystem (void) {
 	                          // Bus clock = 5 MHz, CPU clock = 10MHz
 
   
-  SOPT1_COPT = 0 ;          // WATCHDOG disable 
-    
-  PTAPE = 0xFF ;            // Input ports with pullup
-  PTBPE = 0xFF ;
+  SOPT1_COPT = 0 ;          // WATCHDOG disable      
 }
 
 
@@ -104,11 +127,16 @@ void Configuracion_pulsadores (void) {
 	*/
 
 /********************************************/
-	/*Inicializar puerto A (entrada de datos) */ 		
-  PTAPE |= (PTAPTE_PTAPE1_MASK | PTAPE_PTAPE2_MASK );
-  KBIPE = 0x3				// Enable pin 2 1
-  KBIES = 0x0				// Falling edge
-  KBISC |= 0x2				// Enable interruptions
+                                       
+  /*Inicializar puerto A (entrada de datos) */ 		
+  PTAPE |= (PTAPE_PTAPE1_MASK | PTAPE_PTAPE2_MASK);
+  PTADD &= ~(PTAPE_PTAPE1_MASK | PTAPE_PTAPE2_MASK);   
+  
+  
+  KBIPE |= 0x06;				  // Enable pin 2 1 0
+  KBISC &= ~(0x01);
+  KBIES &= ~(0x06);
+  KBISC |= 0x06;
 /********************************************/ 
   
 }
@@ -116,10 +144,11 @@ void Configuracion_pulsadores (void) {
 void interrupt 4 KBI_handler (void) {
 /********************************************/
 	KBISC |= 0x4;		//clear KBACK
-	if( PTAD & 0x1 == 0x1 ){	// si se ha pulsado
-		pulsador_1 = 1;
-	}else if( PTAD & 0x2 == 0x2 ){
-		pulsador_2 = 1;
+	if(  PTAD_PTAD1 == 0){
+	  pulsador_1 = 1; 
+	}
+	if(  PTAD_PTAD2 == 0){
+	  pulsador_2 = 1; 
 	}
 /********************************************/
 }
