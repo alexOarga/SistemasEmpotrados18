@@ -42,8 +42,12 @@
 #define O_BAJAR   0x40   // 0100_0000
 #define O_PARADO  0x00   // 0000_0000
 
-enum {INICIAL, ...} estado ;
+enum {P0, P1, P2, HACIA_P0, HACIA_P1, HACIA_P2} estado ;
 unsigned char Entrada;     
+/********************************/
+volatile int ultima_planta = 0;
+/********************************/
+
 
 static void InitSystem (void) ;
 static void ConfigurarEntradas(void);
@@ -52,6 +56,10 @@ static void ConfigurarSalidas(void);
 static void GenerarSalida(unsigned char Salida);
 void display (unsigned char queDisplay, unsigned char valor) ;
 
+static unsigned char posicion_bit(unsigned char entrada, unsigned char posicion)
+{
+   return ( entrada >> posicion )&0x1 ;
+}
 
 void main (void){
  
@@ -63,12 +71,53 @@ void main (void){
   while(1){
     Entrada = LeerEntrada();
     switch(estado){
-      case INICIAL :GenerarSalida(...);
-                    if(...)
-                      estado=... ;
+/********************************/
+      case P0 :
+					GenerarSalida(0);
+					display(0, 0);
+                    if( posicion_bit(Entrada,2)==0x1 ){
+                      estado = SUBIR_P1;
+					}else if( posicion_bit(Entrada,3)==0x1 ){
+						 estado = SUBIR_P2;
+					}
                     break;
-                    
-      ...
+		case P1 :
+					GenerarSalida(0);
+					display(0, 1);
+                    if( posicion_bit(Entrada,1)==0x1 ){
+                      estado = BAJAR_P0;
+					}else if( posicion_bit(Entrada,3)==0x1 ){
+						 estado = SUBIR_P2;
+					}
+                    break;
+		case P2 :
+					GenerarSalida(0);
+					display(0, 2);
+                    if( posicion_bit(Entrada,1)==0x1 ){
+                      estado = BAJAR_P0;
+					}else if( posicion_bit(Entrada,2)==0x1 ){
+						 estado = BAJAR_P1;
+					}
+                    break;
+		case HACIA_P0 :
+					GenerarSalida(0);
+                    if( posicion_bit(Entrada,5)==0x1 ){
+                      estado = P0;
+					}
+                    break;
+		case HACIA_P1 :
+					GenerarSalida(0);
+                    if( posicion_bit(Entrada,6)==0x1 ){
+                      estado = P1;
+					}
+                    break;
+		case HACIA_P2 :
+					GenerarSalida(0);
+                    if( posicion_bit(Entrada,7)==0x1 ){
+                      estado = P2;
+					}
+                    break;
+/*******************************/
     }
   }
 }    
@@ -126,3 +175,4 @@ void display (unsigned char queDisplay, unsigned char valor)
   return ;
   
 }  
+
