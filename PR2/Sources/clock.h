@@ -31,5 +31,9 @@ void delay_until(unsigned int T);
     /* Espera bloqueante hasta que la cuenta del reloj llegue
        a T */
        
+void set_timer(unsigned int T);
 
+
+void Start_Clock_after (void) ;
+   /* Puesta en marcha del reloj sin reset counter*/
 #endif

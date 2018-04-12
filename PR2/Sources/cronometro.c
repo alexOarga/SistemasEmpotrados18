@@ -30,6 +30,7 @@ volatile unsigned int siguiente=0;
 /********************************************/
 volatile unsigned int pulsador_1 = 0;
 volatile unsigned int pulsador_2 = 0;
+volatile unsigned int ultimo_counter_timer = 0;
 /********************************************/
 
 /* Funciones */
@@ -67,25 +68,38 @@ void main (void) {
 	unsigned char milisec = (time/100)%10;
 	unsigned char sec_d2;
 	unsigned char sec_d1; 
+	volatile unsigned int time2;
 
 	display (0, milisec);
-	siguiente += periodo ;
-	if(!Detenido) delay_until(siguiente) ;
 	
+	if(!Detenido){
+	  siguiente += periodo ;
+	  delay_until(siguiente);
+	}
 	sec_d1 = (time/1000)%10;
 	display (1, sec_d1);
-	siguiente += periodo ;
-	if(!Detenido) delay_until(siguiente) ;
-	
+
+	if(!Detenido){
+	  	siguiente += periodo ;
+	  delay_until(siguiente) ;
+	}
 	sec_d2 = (time/10000)%10;
 	display (2, sec_d2);
 	
 
   if(pulsador_1 == 1){
-    if(Detenido) Start_Clock ();    
+    if(Detenido){
+      Reset_Clock ();
+      set_timer( ultimo_counter_timer );
+      Start_Clock_after ();    
+      time2 = Get_Time();
+    }else{
+      Stop_Clock(); 
+      ultimo_counter_timer = Get_Time();
+    }
     Detenido = 1 - Detenido;
     pulsador_1=0;
-    siguiente=0;
+    //siguiente=0;
   }
     
   
@@ -97,8 +111,11 @@ void main (void) {
   }
   
 
-	siguiente += periodo ;
-	if(!Detenido) delay_until(siguiente) ;   
+	
+	if(!Detenido){
+	  siguiente += periodo ;
+	  delay_until(siguiente) ;   
+	}
 /********************************************/
    }
 }  

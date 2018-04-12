@@ -92,3 +92,24 @@ void delay_until(unsigned int T){
   while(!(T==tick_counter))
     asm WAIT ;
 }
+
+void set_timer(unsigned int tick_cnt ){
+  //MTIMCNT = T;
+  tick_counter = tick_cnt; 
+}
+
+void Start_Clock_after (void) {
+
+/********************************************/
+  	MTIMCLK_CLKS = 0; // CLKS = 00, ClockSource = BUSCLK
+	MTIMCLK_PS = 5;	// PS = 0101, ClockSource/32, 5 MHz/32 (6.4 us)
+	MTIMMOD = 155; 	// tick = 1 ms (aprox)
+	
+	
+  //	MTIMSC_TRST = 1; // reset MTIM counter
+	MTIMSC_TOIE = 1; // enable MTIM interruption
+	MTIMSC_TSTP = 0;  // start MTIM
+/********************************************/	
+	
+  	return;
+}
