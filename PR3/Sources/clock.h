@@ -1,6 +1,6 @@
 /******************************************************************
 * Area Ingenieria de Sistemas y Automatica
-* Sistemas Empotrados
+* Sistemas Electronicos Programables
 *******************************************************************
 * nombre fichero : clock.h 
 *******************************************************************
@@ -13,8 +13,6 @@
 
 #ifndef clock_h
 #define clock_h
-
-#define NULL 0
 
 void Reset_Clock (void) ;
    /* Instalacion del reloj y puesta a cero*/

@@ -1,7 +1,7 @@
 
 /******************************************************************
 * Area Ingenieria de Sistemas y Automatica
-* Sistemas Empotrados
+* Sistemas Electronicos Programables
 *******************************************************************
 * nombre fichero : clock.c 
 *******************************************************************
