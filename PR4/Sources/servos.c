@@ -57,9 +57,10 @@ float velocity (void) {
 void action (float U) {
 	unsigned int PWM ;
 
-	if (U > 5.0) U = 5.0 ;
-	if (U < -5.0) U = -5.0 ;
-//	PWM =  ;
+	if (U > 5.0) PWM = 1023;
+	else if (U < -5.0) PWM = -1023;
+  else  PWM = ((unsigned int)(U*1023.0/5.0));
+  
 	Set_Value_10b (PWM) ;
 }
 
@@ -67,7 +68,7 @@ float R (float Wref, float W) {
 
 	El = Wref - W ;
 
-	return Ul ;
+	return El ;
 }
 
 
