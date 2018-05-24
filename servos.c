@@ -25,7 +25,7 @@ const unsigned int dNmax = 200 ;
 
 static unsigned int sampling_period ;
 
-float El = 0.0, El_ant = 0.0, Ul = 0.0 ;
+float E1 = 0.0, El_ant = 0.0, Ul = 0.0 ;
 
 
 /******************************************************************************/
@@ -40,6 +40,7 @@ void Init_Servos (unsigned int T) {
 float velocity (void) {
 	static unsigned int previous_counter = 0 ;
 	unsigned int counter ;
+	
 	float dN ;
 
 	counter = Get_Counter () ;
@@ -57,18 +58,26 @@ float velocity (void) {
 void action (float U) {
 	unsigned int PWM ;
 
-	if (U > 5.0) PWM = 1023;
-	else if (U < -5.0) PWM = -1023;
-  else  PWM = ((unsigned int)(U*1023.0/5.0));
+	if (U > 5.0){
+	  PWM = 1023;
+	}
+  else if(U< -5.0){
+    PWM = -1023;
+  }
+  else{
+    float aux;
+    aux = (U*512.0)/5.0 + 512;
+    PWM = (unsigned int)aux;
+  }
   
 	Set_Value_10b (PWM) ;
 }
 
 float R (float Wref, float W) {
 
-	El = Wref - W ;
-
-	return El ;
+	E1 = Wref - W;
+  Ul = Wref - W;
+	return Ul;
 }
 
 
