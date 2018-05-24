@@ -11,7 +11,12 @@ static void InitSystem (void) ;
 
 unsigned int siguiente, periodo = 100 ;
 float E, E_ant, U ;
-float Y, Yd;
+float Y;
+float Yd;
+
+float stages[3] = {-1.0, 1.0, 3.0};
+int pos_stage;
+int counter_ck;
 
 
 
@@ -26,22 +31,37 @@ void main(void) {
  Reset_Clock () ;
  Start_Clock () ;
  
+ E_ant = 0.0 ;
+ U = 0.0 ;
  
- siguiente = Get_Time () ;
-
-
-  E_ant = 0.0 ;
-  U=0.0;
+ pos_stage = 0;
+ counter_ck = 0;
+ 
+ siguiente = Get_Time () ; 
   
-  while(1) {
+ while(1) {
     Y = velocity();
+ 
+    
     Yd = Read_Value_Int_1();
-    Yd=8.0*(float)Yd/1024.0;
-    Yd-=4.0;
-    E=R(Yd,Y);
+                           
+        counter_ck = counter_ck + 1;
+        if( counter_ck == 50 ){
+            counter_ck = 0;
+            pos_stage = pos_stage + 1;
+            if( pos_stage == 3 ){
+               pos_stage = 0;
+            }
+        }
+        Yd = stages[ pos_stage ];
+                             
+           
+    //Yd = (8.0*Yd)/1024.0;
+    //Yd = Yd - 4.0; 
+    E = R (Yd, Y);
     U = (0.572*E) - (0.286*E_ant) + U ;
-    action (U) ;
-    E_ant = E ;    
+    action(U) ;
+    E_ant = E ;
     siguiente += periodo ;
     delay_until (siguiente) ;
    }
