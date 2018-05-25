@@ -18,7 +18,7 @@ static void led( unsigned char Salida );
 unsigned int siguiente, periodo = 50 ;
 float E, E_ant, U ;
 float Y;
-float Yd;
+float Yd = 0.0;
 
 
 
@@ -49,8 +49,8 @@ unsigned int centrifugado = 0; /* centrifugado 0 / 1 */
 /* el valor de centrifugado habra que cambiarlo al iniciar  */
 float programa1_giro[5] = { 1, -1, 1, 0, 0 };
 unsigned int programa1_duracion[5] = {4000, 4000, 4000, 4000, 10000};
-float programa2_giro[4] = { -0.5, 1, 0, centrifugado };
-unsigned int programa2_duracion[4] = {2000,4000,2000,6000};
+float programa2_giro[4] = { -0.5, 1, 0, 0 };
+unsigned int programa2_duracion[4] = {2000, 4000, 2000, 6000};
 float programa3_giro[2] = { 0, 0 };
 unsigned int programa3_duracion[2] = {3000 , 3000};
 const unsigned int P1_LENGTH = 5;
@@ -90,21 +90,19 @@ void main(void) {
   
   while(1) {
   
-  display (0x00, paso); 
+  display (0x00, paso+1); 
   
 	if( muestreo == 1 ){
 		muestreo = 0;
 		Y = velocity();
 		//Yd = Read_Value_Int_1();
-		Yd = 0;
-		Yd=8.0*(float)Yd/1024.0;
-		Yd-=4.0;
+		//Yd = 0.0;
+		//Yd=8.0*(float)Yd/1024.0;
+		//Yd-=4.0;
 		E=R(Yd,Y);
 		U = (0.572*E) - (0.286*E_ant) + U ;
 		action (U) ;
 		E_ant = E ;    
-		siguiente += periodo ;
-		delay_until (siguiente) ;
 	}
 	muestreo = muestreo + 1;
 
@@ -115,7 +113,7 @@ void main(void) {
 	pulsador_4 = 0;
 	pulsador_5 = 0;
 
-  display (0x00, paso); 
+  display (0x00, paso+1); 
 
 	if( PTAD_PTAD1 == 0 ){
 		pulsador_0 = 1;
@@ -136,14 +134,14 @@ void main(void) {
 		pulsador_5 = 1;
 	}
 	
-  display (0x00, paso); 
+  display (0x00, paso+1); 
 /**********************************************************************/
     	switch(estado_actual){
       	case	NP:
     			led(0x00);
     			paso = 0; 		/*variable para almacenar paso actual del progama*/ 	
     			tiempo_paso = 0;
-    			Yd = 0;
+    			Yd = 0.0;
     			if( pulsador_2 == 1 ){
     				programa = 2;
     				estado_actual = P2;
@@ -220,12 +218,22 @@ void main(void) {
     				break;
     		case P12:
     			if( pulsador_0 == 0 ){
+    			  if( centrifugado == 1 ){
+    			      programa1_giro[4]  = 3.2;
+    			  }else{
+    			      programa1_giro[4]  = 2.8;
+    			  }
     				estado_actual = PM1;
     				paso = 0;
     				tiempo_paso = 0;
     			}
     				break;
     		case P22:
+    		  if( centrifugado == 1 ){
+    			      programa2_giro[3]  = 3.2;
+    			  }else{
+    			      programa2_giro[3]  = 2.8;
+    			  }
     			if( pulsador_0 == 0 ){
     				paso = 0;
     				tiempo_paso = 0;
@@ -234,6 +242,13 @@ void main(void) {
     				break;
     		case P32:
     			if( pulsador_0 == 0 ){
+    			  if( centrifugado == 1 ){
+    			      programa3_giro[0]  = -3.2;
+    			      programa3_giro[1]  = 3.2;
+    			  }else{
+    			      programa3_giro[0]  = -2.8;
+    			      programa3_giro[1]  = 2.8;
+    			  }
     				paso = 0;
     				tiempo_paso = 0;
     				estado_actual = PM3;
@@ -247,7 +262,7 @@ void main(void) {
     				Yd = programa1_giro[ paso ];
     				tiempo_paso = tiempo_paso + 50;
       				if( tiempo_paso > programa1_duracion[paso] ){
-      				tiempo_paso = 0;
+      				    tiempo_paso = 0;
       					  paso = paso + 1;
         					if( paso == P1_LENGTH ){
         						/* end TODO */
@@ -264,7 +279,7 @@ void main(void) {
     				Yd = programa2_giro[ paso ];
     				tiempo_paso = tiempo_paso + 50;
       				if( tiempo_paso > programa2_duracion[paso] ){
-      				tiempo_paso = 0;
+      				    tiempo_paso = 0;
       					  paso = paso + 1;
         					if( paso == P2_LENGTH ){
         						/* end TODO */
@@ -272,6 +287,7 @@ void main(void) {
         					}
       				}
     			}
+    			break;
     		case PM3:
     			if( pulsador_0 == 1 ){
     				/* RESET TODO */
@@ -292,7 +308,12 @@ void main(void) {
      	}  // SWITCH
      	
      	
-     	display (0x00, paso); 
+     	
+     	display (0x00, paso+1); 
+     	siguiente += periodo ;
+		  delay_until (siguiente) ;
+     	
+     	
      	
   }//WHILÑE
 }
