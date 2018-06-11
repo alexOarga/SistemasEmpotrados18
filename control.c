@@ -14,6 +14,7 @@ static void Init_LED();
 static void display (unsigned char queDisplay, unsigned char valor);
 	/* Muestra valor por el display queDisplay (0, 1, 2) */
 static void led( unsigned char Salida );
+static void led_cntf( unsigned char Salida );
 
 unsigned int siguiente, periodo = 50 ;
 float E, E_ant, U ;
@@ -70,6 +71,9 @@ unsigned int pulsador_5 = 0;
 unsigned int muestreo = 0; 	/* 0 1 señal para muestreo cada 100ms */
 
 
+void timer_fn(){
+  
+}
 
 void main(void) {
  
@@ -78,6 +82,7 @@ void main(void) {
  Init_Encoder ();
  Init_PWM () ;
  Init_AD () ;
+ Init_LED() ;
  Init_Servos (periodo) ;
  
  Reset_Clock () ;
@@ -88,10 +93,18 @@ void main(void) {
   E_ant = 0.0 ;
   U=0.0;
   
+   Set_Timer(periodo, timer_fn);
+  
   while(1) {
   
-  display (0x00, paso+1); 
+  //display (0x00, paso); 
+ // display(0x01, programa);
   
+if( Time_Out() ){
+  
+    Remove_Timer();
+    Set_Timer(periodo, timer_fn);
+
 	if( muestreo == 1 ){
 		muestreo = 0;
 		Y = velocity();
@@ -113,7 +126,9 @@ void main(void) {
 	pulsador_4 = 0;
 	pulsador_5 = 0;
 
-  display (0x00, paso+1); 
+display(0x01, programa);
+  display (0x00, paso); 
+ 
 
 	if( PTAD_PTAD1 == 0 ){
 		pulsador_0 = 1;
@@ -134,8 +149,12 @@ void main(void) {
 		pulsador_5 = 1;
 	}
 	
-  display (0x00, paso+1); 
+  display (0x00, paso);
+  display(0x01, programa); 
 /**********************************************************************/
+  
+      
+    
     	switch(estado_actual){
       	case	NP:
     			led(0x00);
@@ -159,11 +178,11 @@ void main(void) {
     				estado_actual = P12;
     			}
     			if( pulsador_4 == 1 ){
-    				led(PLCN);
+    				led_cntf(PLCN);
     				centrifugado = 0;
     			}
     			if( pulsador_5 == 1 ){
-    				led(PLCF);
+    				led_cntf(PLCF);
     				centrifugado = 1;
     			}
     			if( pulsador_2 == 1 ){
@@ -180,11 +199,11 @@ void main(void) {
     				estado_actual = P22;
     			}
     			if( pulsador_4 == 1 ){
-    				led(PLCN);
+    				led_cntf(PLCN);
     				centrifugado = 0;
     			}
     			if( pulsador_5 == 1 ){
-    				led(PLCF);
+    				led_cntf(PLCF);
     				centrifugado = 1;
     			}
     			if( pulsador_1 == 1 ){
@@ -201,11 +220,11 @@ void main(void) {
     				estado_actual = P32;
     			}
     			if( pulsador_4 == 1 ){
-    				led(PLCN);
+    				led_cntf(PLCN);
     				centrifugado = 0;
     			}
     			if( pulsador_5 == 1 ){
-    				led(PLCF);
+    				led_cntf(PLCF);
     				centrifugado = 1;
     			}
     			if( pulsador_1 == 1 ){
@@ -306,12 +325,18 @@ void main(void) {
     			}
     				break;					
      	}  // SWITCH
+  } //if
      	
-     	
-     	
-     	display (0x00, paso+1); 
-     	siguiente += periodo ;
-		  delay_until (siguiente) ;
+     display(0x01, programa); 
+     		
+   display (0x00, paso);
+    
+    // display(0x01, programa); 
+    // display (0x00, paso);
+    
+     
+     //	siguiente += periodo ;
+		  //delay_until(siguiente);
      	
      	
      	
@@ -349,24 +374,30 @@ void Init_Button(){
 void Init_LED(){
    PTBDD_PTBDD0 = 1 ; 
    PTBDD_PTBDD1 = 1 ; 
-     PTBDD_PTBDD2 = 1 ;  
+   PTBDD_PTBDD2 = 1 ;  
 	 PTBDD_PTBDD3 = 1 ; 
 	 PTBDD_PTBDD4 = 1 ;      
-     PTBDD_PTBDD5 = 1 ;
+   PTBDD_PTBDD5 = 1 ;
 	 PTBDD_PTBDD6 = 1 ;
 	 PTBDD_PTBDD7 = 1 ;   
 	 
-	 PTBD_PTBD0 = 1 ;   
-     PTBD_PTBD1 = 1 ;        
-     PTBD_PTBD2 = 1 ; 
-	 PTBD_PTBD3 = 1 ;   
-     PTBD_PTBD4 = 1 ;        
-     PTBD_PTBD5 = 1 ;
-	 PTBD_PTBD6 = 1 ;
-	 PTBD_PTBD7 = 1 ;      
+	 PTBD_PTBD0 = 0 ;   
+   PTBD_PTBD1 = 0 ;        
+   PTBD_PTBD2 = 0 ; 
+	 PTBD_PTBD3 = 0 ;   
+   PTBD_PTBD4 = 0 ;        
+   PTBD_PTBD5 = 0 ;
+	 PTBD_PTBD6 = 0 ;
+	 PTBD_PTBD7 = 0 ;      
 }
 
 void led( unsigned char Salida ){
+	PTBD &= (0xC0);
+	PTBD = (Salida) | (PTBD & 0xFF);
+}
+
+void led_cntf( unsigned char Salida ){
+  PTBD &= (0x3F);
 	PTBD = (Salida) | (PTBD & 0xFF);
 }
 
