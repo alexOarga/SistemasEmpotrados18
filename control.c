@@ -68,7 +68,7 @@ unsigned int pulsador_4 = 0;
 unsigned int pulsador_5 = 0;
 
 
-unsigned int muestreo = 0; 	/* 0 1 señal para muestreo cada 100ms */
+unsigned int muestreo = 0; 	/* 0 1 seÃ±al para muestreo cada 100ms */
 
 
 void timer_fn(){
@@ -101,11 +101,12 @@ void main(void) {
  // display(0x01, programa);
   
 if( Time_Out() ){
-  
+  	PTDD_PTDD1 = 1; // PUERTO D 
     Remove_Timer();
     Set_Timer(periodo, timer_fn);
 
 	if( muestreo == 1 ){
+		PTDD_PTDD6 = 1; // PUERTO D
 		muestreo = 0;
 		Y = velocity();
 		//Yd = Read_Value_Int_1();
@@ -115,7 +116,8 @@ if( Time_Out() ){
 		E=R(Yd,Y);
 		U = (0.572*E) - (0.286*E_ant) + U ;
 		action (U) ;
-		E_ant = E ;    
+		E_ant = E ; 
+		PTDD_PTDD6 = 0; // PUERTO D 
 	}
 	muestreo = muestreo + 1;
 
@@ -325,11 +327,15 @@ display(0x01, programa);
     			}
     				break;					
      	}  // SWITCH
+	
+	PTDD_PTDD1 = 0; 
+	
   } //if
-     	
+     
+   
      display(0x01, programa); 
-     		
-   display (0x00, paso);
+     display (0x00, paso);
+
     
     // display(0x01, programa); 
     // display (0x00, paso);
@@ -340,7 +346,7 @@ display(0x01, programa);
      	
      	
      	
-  }//WHILÑE
+  }//WHILE
 }
 
 
@@ -356,6 +362,12 @@ void InitSystem (void) {
 
   
   SOPT1_COPT = 0 ;          // WATCHDOG disable 
+}
+
+void Init_D(){
+	 PTDDD_PTDDD0 = 0 ; /* As output */   
+	 PTDDD_PTDDD1 = 0 ; /* As output */  
+	 PTDDD_PTDDD6 = 0 ; /* As output */  
 }
 
 void Init_Display(){
@@ -402,6 +414,7 @@ void led_cntf( unsigned char Salida ){
 }
 
 void display (unsigned char queDisplay, unsigned char valor) {
+	PTDD_PTDD0 = 1; // PUERTO D
   if(queDisplay ==55){
     queDisplay = 1;
   }
@@ -415,4 +428,6 @@ void display (unsigned char queDisplay, unsigned char valor) {
       PTCD &= ~((1 << queDisplay) << 4);
 		  
 	}
+	
+	PTDD_PTDD0 = 0; // PUERTO D 
 }  
